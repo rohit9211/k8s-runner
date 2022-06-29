@@ -29,11 +29,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .[test]
         pip install codecov
+
+    - name: Lint with flake8
+      run: |
+        flake8
+
     - name: Test with pytest
       working-directory: exco/
       run: |
         pytest --cov-report=xml:coverage.xml --cov-config=.coveragerc --cov=./
         codecov
+        
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
