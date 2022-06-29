@@ -19,24 +19,26 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
 
-    # Setup gcloud CLI
-    - uses: google-github-actions/setup-gcloud@v0.6.0
-      with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ secrets.GKE_PROJECT }}
-        export_default_credentials: true 
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v0.6.0
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          export_default_credentials: true 
 
-    # Build the Docker image
-    - name: Build and Push
-      working-directory: release/src/Tailwind.Traders.Web
-      run: |-  
-        docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA" .
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA"
+      - name: Build and Push Docker Image
+        #run: docker build -t "us.gcr.io/ebo-sandbox/$IMAGE:${GITHUB_SHA:0:8}" .
+        run: |-  
+         docker build \
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}" .
+         gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+         docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}"
 
 
   build-and-push-dockerhub: 

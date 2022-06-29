@@ -1,4 +1,4 @@
-name: Trivy Scan
+name: trivy-scan
 
 on: [workflow_dispatch]
 
@@ -33,16 +33,14 @@ jobs:
       working-directory: release/src/Tailwind.Traders.Web
       run: |-  
         docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:${{ github.sha }}" .
-
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:${{ github.sha }}"
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}" .
+        gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+        docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}"
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-          image-ref: 'europe-west3-docker.pkg.dev/rg-shared-vpc/rg-shared-vpc/demo-shop-k8s-runner-single:${{ github.sha }}'
+          image-ref: '${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}'
        #   format: 'sarif'
        #   output: 'trivy-results.sarif'
           format: 'table'
