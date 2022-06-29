@@ -6,6 +6,6 @@ metadata:
   namespace: actions-runner-system
 spec:
   repository: rohit9211/k8s-runner
-  #labels:
-  #      - single-custom-runner
+  labels:
+        - single-custom-runner
   env: []
