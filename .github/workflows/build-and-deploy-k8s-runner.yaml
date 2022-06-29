@@ -1,4 +1,4 @@
-name: Build and Deploy K8s Runner
+name: build-deploy-k8s-runner
 
 
 on: [workflow_dispatch]
@@ -39,9 +39,7 @@ jobs:
         #run: docker build -t "us.gcr.io/ebo-sandbox/$IMAGE:${GITHUB_SHA:0:8}" .
         run: |-  
          docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA" \
-          --build-arg ${GITHUB_SHA} \
-          .
+          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA" .
          gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
          docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA"
 
