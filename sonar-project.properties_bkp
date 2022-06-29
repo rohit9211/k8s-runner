@@ -1,0 +1,23 @@
+# required metdata
+sonar.projectKey=rohit9211_k8s-runner
+sonar.organization=gaurrohit
+sonar.projectVersion=1.0
+sonar.sourceEncoding=UTF-8
+sonar.working.directory=/tmp
+project.settings=sonar-project.properties
+#sonar.log.level=DEBUG
+#sonar.verbose=true
+#sonar.projectBaseDir=/home/github/_work/k8s-runner/k8s-runner/
+# sonar.language=js
+sonar.eslint.eslintconfigpath=app/eslintrc.json
+
+# path to srouce directories
+sonar.sources=app
+# sonar.tests=app/test/integration/api/
+
+# excludes
+sonar.exclusions=app/node_modules/*,app/coverage/lcov-report/*,app/test/integration/api/v1/*,app/middlewares/common-middleware.js
+
+# coverage reporting
+sonar.javascript.lcov.reportPaths=app/coverage/lcov.info
+# sonar.surefire.reportPaths=app/coverage/lcov-report

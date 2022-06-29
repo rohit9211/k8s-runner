@@ -13,70 +13,35 @@ env:
   GKE_ZONE: europe-west3-a
   
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    # Setup gcloud CLI
-   # - name: Setup gcloud CLI
-   #   uses: google-github-actions/setup-gcloud@v0.6.0
-   #   with:
-   #     service_account_key: ${{ secrets.GKE_SA_KEY }}
-   #     project_id: ${{ secrets.GKE_PROJECT }}
-   #     export_default_credentials: true 
-    
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+    - uses: actions/checkout@v2
       with:
-        languages: csharp
-
-    - name: Autobuild
-      #uses: github/codeql-action/autobuild@v1
-      run: |-
-          make bootstrap
-          make release
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-
-    # Build the Docker image
-  #  - name: Build and Push Docker Image
-  #    working-directory: release/src/Tailwind.Traders.Web
-  #    run: |-  
-  #      docker build \
-  #        --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA" .
-  #      gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-  #      docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:$GITHUB_SHA"     
-
-  #Deploy:
-  #  runs-on: ubuntu-latest
-  #  environment: prod
-  #  needs: Build
-
-  #  steps:
-  #  - name: Checkout
-  #    uses: actions/checkout@v3
-
-    # Setup gcloud CLI
-  #  - uses: google-github-actions/setup-gcloud@v0.6.0
-  #    with:
-  #      service_account_key: ${{ secrets.GKE_SA_KEY }}
-  #      project_id: ${{ secrets.GKE_PROJECT }}
-   #     export_default_credentials: true 
-
-    # Get the GKE credentials so we can deploy to the cluster
-   # - uses: google-github-actions/get-gke-credentials@v0.5.0
-   #   with:
-    #    cluster_name: ${{ env.GKE_CLUSTER }}
-    #    location: ${{ env.GKE_ZONE }}
-    #    credentials: ${{ secrets.GKE_SA_KEY }}
-
-    # Deploy the new Docker image to the GKE cluster
-    #- name: Deploy
-    #  working-directory: release/src/Tailwind.Traders.Web
-    #  run: |-
-    #    envsubst < Service.yml | kubectl apply -f -
-    #    envsubst < Deployment.yml | kubectl apply -f -
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      working-directory: exco/
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[test]
+        pip install codecov
+    - name: Test with pytest
+      working-directory: exco/
+      run: |
+        pytest --cov-report=xml:coverage.xml --cov-config=.coveragerc --cov=./
+        codecov
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.exclusions="*.xml"
+          -Dsonar.qualitygate.wait=true
+    
