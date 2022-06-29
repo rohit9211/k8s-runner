@@ -1,4 +1,4 @@
-name: SonarScanner Cloud Scan
+name: sonarscanner-cloud
 
 on: [workflow_dispatch]
 
