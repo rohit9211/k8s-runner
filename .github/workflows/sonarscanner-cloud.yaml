@@ -1,0 +1,22 @@
+name: SonarScanner Cloud Scan
+
+on: [workflow_dispatch]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: self-hosted
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+      #  uses: sonarsource/sonarqube-scan-action@master
+        with:
+          args: >
+           -Dproject.settings=sonar-project.properties      
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          #INPUT_PROJECTBASEDIR: /home/github/_work/k8s-runner/k8s-runner/

@@ -1,0 +1,28 @@
+---
+name: SelfHosted_Multiple CRD
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    name: Build Docker
+    runs-on: multi-custom-runner
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build docker
+      working-directory: docker
+      run: |
+        docker build -t test .
+  build-2:
+    name: Build Docker
+    runs-on: multi-custom-runner
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build docker
+      working-directory: docker
+      run: |
+        docker build -t test .

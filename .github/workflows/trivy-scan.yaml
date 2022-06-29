@@ -1,0 +1,65 @@
+name: Trivy Scan
+
+on: [workflow_dispatch]
+
+env:
+  GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: demo-cluster
+  GKE_APP_NAME: demo-shop-k8s-runner-single
+  GKE_SERVICE: gke-service
+  GKE_SERVICE_ACCOUNT: gke-serviceaccount
+  GKE_DEPLOYMENT_NAME: demo-shop-deployment
+  GKE_REGION: europe-west3
+  GKE_ZONE: europe-west3-a
+  
+jobs:
+  Build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0.6.0
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
+        export_default_credentials: true 
+
+    # Build the Docker image
+    - name: Build
+      id: build-image
+      working-directory: release/src/Tailwind.Traders.Web
+      run: |-  
+        docker build \
+          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:${{ github.sha }}" .
+
+        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
+
+        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:${{ github.sha }}"
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+          image-ref: 'europe-west3-docker.pkg.dev/rg-shared-vpc/rg-shared-vpc/demo-shop-k8s-runner-single:${{ github.sha }}'
+       #   format: 'sarif'
+       #   output: 'trivy-results.sarif'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+   # - name: Upload Trivy scan results to GitHub Security tab
+   #   uses: github/codeql-action/upload-sarif@v2
+   #   if: always()
+   #   with:
+   #       sarif_file: 'trivy-results.sarif'
+
+    - name:  Push
+      working-directory: release/src/Tailwind.Traders.Web
+      run: |-  
+        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
+        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME:${{ github.sha }}"
+ 
