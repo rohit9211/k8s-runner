@@ -34,8 +34,8 @@ jobs:
         languages: csharp
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
-      run: |
+      #uses: github/codeql-action/autobuild@v1
+      run: |-
           make bootstrap
           make release
 
