@@ -1,0 +1,39 @@
+name: crd-k8s-runner-single
+
+on: [workflow_dispatch]
+
+env:
+  GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: demo-cluster
+  GKE_APP_NAME: demo-shop-k8s-runner-single
+  GKE_SERVICE: gke-service
+  GKE_SERVICE_ACCOUNT: gke-serviceaccount
+  GKE_DEPLOYMENT_NAME: demo-shop-deployment
+  GKE_REGION: europe-west3
+  GKE_ZONE: europe-west3-a
+  
+jobs:
+  Build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v0.6.0
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          export_default_credentials: true 
+
+      - name: Build and Push Docker Image
+        #run: docker build -t "us.gcr.io/ebo-sandbox/$IMAGE:${GITHUB_SHA:0:8}" .
+        run: |-  
+         docker build \
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}" .
+         gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+         docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}"

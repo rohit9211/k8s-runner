@@ -1,4 +1,4 @@
-name: Github_Hosted_Runner
+name: github-hosted-runner
 
 on: [workflow_dispatch]
 

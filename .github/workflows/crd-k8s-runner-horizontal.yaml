@@ -1,5 +1,5 @@
 ---
-name: SelfHosted Horizontal CRD
+name: crd-k8s-runner-horizontal
 
 on: [workflow_dispatch]
 
