@@ -1,4 +1,4 @@
-name: Publish-to-DockerHub
+name: build-push-dockerhub
 
 on: [workflow_dispatch]
 
