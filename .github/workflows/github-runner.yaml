@@ -38,7 +38,7 @@ jobs:
     - name: Test with pytest
       working-directory: exco/
       run: |
-        pytest --cov-report=xml:coverage.xml --cov-config=.coveragerc --cov=./
+        pytest --cov-report=xml:coverage.xml --cov-config=.coveragerc --cov=./exco
         codecov
 
     - name: SonarCloud Scan
