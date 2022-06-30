@@ -16,7 +16,8 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
     - name: Set up Python 3.8
@@ -51,4 +52,28 @@ jobs:
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.exclusions="*.xml"
           -Dsonar.qualitygate.wait=false
+
+    - name: Build and Push Docker Image
+      working-directory: exco/
+      run: |-  
+         docker build \
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}" .
+         gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+         docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}"
+      
     
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}:${{ github.sha }}'
+        format: 'sarif'
+        output: 'trivy-k8s-runner-results.sarif'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+          sarif_file: 'trivy-k8s-runner-results.sarif'
