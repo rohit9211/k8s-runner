@@ -3,6 +3,16 @@ name: crd-k8s-runner-horizontal
 
 on: [workflow_dispatch]
 
+env:
+  GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: demo-cluster
+  GKE_APP_NAME: demo-shop-k8s-runner-single
+  GKE_SERVICE: gke-service
+  GKE_SERVICE_ACCOUNT: gke-serviceaccount
+  GKE_DEPLOYMENT_NAME: demo-shop-deployment
+  GKE_REGION: europe-west3
+  GKE_ZONE: europe-west3-a
+
 jobs:
   build-1:
     name: Build Docker 1
@@ -22,9 +32,9 @@ jobs:
       working-directory: docker/
       run: |-  
         docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_1:$GITHUB_SHA" .
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_1:$GITHUB_SHA"
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT  }}/${{ env.GKE_APP_NAME }}_1:${{ github.sha }}" .
+        gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+        docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}_1:${{ github.sha }}"
   build-2:
     name: Build Docker 2
     runs-on: multi-custom-runner
@@ -43,9 +53,9 @@ jobs:
       working-directory: docker/
       run: |-  
         docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_2:$GITHUB_SHA" .
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_2:$GITHUB_SHA"
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT  }}/${{ env.GKE_APP_NAME }}_2:${{ github.sha }}" .
+        gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+        docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}_2:${{ github.sha }}"
   build-3:
     name: Build Docker 3
     runs-on: multi-custom-runner
@@ -64,9 +74,9 @@ jobs:
       working-directory: docker/
       run: |-  
         docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_3:$GITHUB_SHA"  .
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_3:$GITHUB_SHA"
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT  }}/${{ env.GKE_APP_NAME }}_3:${{ github.sha }}" .
+        gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+        docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}_3:${{ github.sha }}"
   build-4:
     name: Build Docker 4
     runs-on: multi-custom-runner
@@ -85,9 +95,9 @@ jobs:
       working-directory: docker/
       run: |-  
         docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_4:$GITHUB_SHA" .
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_4:$GITHUB_SHA"
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT  }}/${{ env.GKE_APP_NAME }}_4:${{ github.sha }}" .
+        gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+        docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}_4:${{ github.sha }}"
   build-5:
     name: Build Docker 5
     runs-on: multi-custom-runner
@@ -106,6 +116,7 @@ jobs:
       working-directory: docker/
       run: |-  
         docker build \
-          --tag "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_5:$GITHUB_SHA" .
-        gcloud auth configure-docker $GKE_REGION-docker.pkg.dev --quiet
-        docker push "$GKE_REGION-docker.pkg.dev/$GKE_PROJECT/$GKE_PROJECT/$GKE_APP_NAME_5:$GITHUB_SHA"
+          --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT  }}/${{ env.GKE_APP_NAME }}_5:${{ github.sha }}" .
+        gcloud auth configure-docker ${{ env.GKE_REGION }}-docker.pkg.dev --quiet
+        docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.GKE_PROJECT }}/${{ env.GKE_PROJECT }}/${{ env.GKE_APP_NAME }}_5:${{ github.sha }}"
+
