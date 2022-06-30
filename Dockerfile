@@ -1,5 +1,5 @@
 #FROM debian:buster-slim
-FROM ubuntu:bionic
+FROM ubuntu:18.04
 
 ENV GITHUB_PAT ""
 ENV GITHUB_OWNER ""
@@ -11,18 +11,16 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-        apt-transport-https=1.8.2.2 \
-        ca-certificates=20200601~deb10u2 \
-        gnupg=2.2.12-1+deb10u1 \
-        gnupg-agent=2.2.12-1+deb10u1 \
-        software-properties-common=0.96.20.2-2 \
-        curl=7.64.0-4+deb10u2 \
-        git=1:2.20.1-2+deb10u3 \
-        jq=1.5+dfsg-2+b1 \
+        apt-transport-https \
+        ca-certificates \
+        gnupg \
+        gnupg-agent  \
+        software-properties-common \
         curl \
         xvfb \
         sudo \
         libgtk2.0-0 \
+        lsb-release \
         libgtk-3-0 \
         libgbm-dev \
         libnotify-dev \
@@ -46,14 +44,17 @@ RUN apt-get update \
 
 
 # Install Docker client
-RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
-    && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" \
+RUN mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && echo \
+       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+       $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null \
     && apt-get update \
-    && apt-get install docker-ce-cli=5:20.10.2~3-0~debian-buster --no-install-recommends -y \
+    && apt-get install docker-ce-cli --no-install-recommends -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* 
-
-USER github
+   
+#USER github
 WORKDIR /home/github
 
 # Install github runner packages
