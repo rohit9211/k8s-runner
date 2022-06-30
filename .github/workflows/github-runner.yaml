@@ -37,10 +37,10 @@ jobs:
         pip install -e .[test]
         pip install codecov
 
-    - name: Lint with flake8
-      working-directory: exco/
-      run: |
-        flake8
+   # - name: Lint with flake8
+   #   working-directory: exco/
+   #   run: |
+   #     flake8
 
     - name: Test with pytest
       working-directory: exco/
