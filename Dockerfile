@@ -33,6 +33,7 @@ RUN apt-get update \
         xauth   \
         jq   \
         git \
+        python3-pip \
       #  yq \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
