@@ -39,7 +39,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -m github \
     && usermod -aG sudo github \
-    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && mkdir -p /opt/hostedtoolcache \
+    && chown -R github:github /opt
+
 
 # Install Docker client
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
@@ -57,8 +60,7 @@ RUN GITHUB_RUNNER_VERSION=$(curl --silent "https://api.github.com/repos/actions/
     && curl -Ls https://github.com/actions/runner/releases/download/v${GITHUB_RUNNER_VERSION}/actions-runner-linux-x64-${GITHUB_RUNNER_VERSION}.tar.gz | tar xz \
     && sudo ./bin/installdependencies.sh
 
-
-
+ENV AGENT_TOOLSDIRECTORY=/opt/hostedtoolcache
 # Entrypoint
 COPY --chown=github:github entrypoint.sh  ./
 RUN sudo chmod u+x ./entrypoint.sh
