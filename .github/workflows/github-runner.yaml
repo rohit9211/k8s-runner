@@ -23,9 +23,11 @@ jobs:
 
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
+      env: 
+        AGENT_TOOLSDIRECTORY: "/opt/hostedtoolcache"
       with:
-        python-version: '3.8'
-        cache: 'pip'
+        python-version: "3.8"
+        cache: "pip"
 
     - name: Install dependencies
       working-directory: exco/
